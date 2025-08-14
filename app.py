@@ -1,25 +1,62 @@
 import streamlit as st
+import pickle
+import string
 import nltk
+from nltk.stem import PorterStemmer
 
-st.title("NLTK Download Test")
+# --- NLTK Data Handling Fix ---
+# Define a directory to store NLTK data
+DOWNLOAD_DIR = './nltk_data/'
+# Download required NLTK data to the specified directory
+nltk.download('punkt', download_dir=DOWNLOAD_DIR)
+nltk.download('stopwords', download_dir=DOWNLOAD_DIR)
+# Add the custom directory to NLTK's data path
+nltk.data.path.append(DOWNLOAD_DIR)
+# --- End of Fix ---
 
-try:
-    st.write("Attempting to download 'punkt'...")
-    nltk.download('punkt')
-    st.success("✅ 'punkt' downloaded successfully!")
+ps = PorterStemmer()
 
-    st.write("Attempting to download 'stopwords'...")
-    nltk.download('stopwords')
-    st.success("✅ 'stopwords' downloaded successfully!")
+def transform_text(text):
+    text = text.lower()
+    text = nltk.word_tokenize(text)
 
-    st.write("---")
-    st.header("Testing Tokenizer")
-    test_sentence = "This is a test sentence."
-    tokens = nltk.word_tokenize(test_sentence)
-    st.write(f"Tokenizing: '{test_sentence}'")
-    st.write("Result:", tokens)
-    st.success("✅ Tokenizer test passed!")
+    y = []  # Initialize y as an empty list
+    for i in text:
+        if i.isalnum():
+            y.append(i)
+    
+    text = y[:]
+    y.clear()  # Clear the list y
 
-except Exception as e:
-    st.error("A critical error occurred during the test:")
-    st.exception(e)
+    for i in text:
+        if i not in stopwords.words('english') and i not in string.punctuation:
+            y.append(i)
+
+    text = y[:]
+    y.clear()  # Clear the list y again
+
+    for i in text:
+        y.append(ps.stem(i))
+
+    return " ".join(y)
+
+# Load the trained model and vectorizer
+tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
+model = pickle.load(open('model.pkl', 'rb'))
+
+st.title("Email/SMS Spam Classifier")
+
+input_sms = st.text_area("Enter the message")
+
+if st.button("Predict"):
+    # 1. preprocess the input text
+    transform_sms = transform_text(input_sms)
+    # 2. vectorize the input text
+    vector_input = tfidf.transform([transform_sms])
+    # 3. predict the class of the input text
+    result = model.predict(vector_input)[0]
+    # 4. display the result
+    if result == 1:
+        st.header("Spam")
+    else:
+        st.header("Not Spam")
