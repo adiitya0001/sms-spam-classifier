@@ -8,8 +8,7 @@ To run this project on your local machine, follow these steps:
 
 1.  **Clone the repository:**
     ```sh
-    git clone [https://github.com/aditya0001/sms-spam-classifier.git](https://github.com/aditya0001/sms-spam-classifier.git)
-    cd sms-spam-classifier
+    git clone https://github.com/aditya0001/sms-spam-classifier.git
     ```
 
 2.  **Create a virtual environment:**
