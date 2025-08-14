@@ -2,17 +2,10 @@ import streamlit as st
 import pickle
 import string
 import nltk
+from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-# --- NLTK Data Handling Fix ---
-# Define a directory to store NLTK data
-DOWNLOAD_DIR = './nltk_data/'
-# Download required NLTK data to the specified directory
-nltk.download('punkt', download_dir=DOWNLOAD_DIR)
-nltk.download('stopwords', download_dir=DOWNLOAD_DIR)
-# Add the custom directory to NLTK's data path
-nltk.data.path.append(DOWNLOAD_DIR)
-# --- End of Fix ---
+nltk.download('punkt_tab')
 
 ps = PorterStemmer()
 
@@ -40,11 +33,10 @@ def transform_text(text):
 
     return " ".join(y)
 
-# Load the trained model and vectorizer
 tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
 model = pickle.load(open('model.pkl', 'rb'))
 
-st.title("Email/SMS Spam Classifier")
+st.title("Emial/SMS Spam Classifier")
 
 input_sms = st.text_area("Enter the message")
 
@@ -53,10 +45,11 @@ if st.button("Predict"):
     transform_sms = transform_text(input_sms)
     # 2. vectorize the input text
     vector_input = tfidf.transform([transform_sms])
-    # 3. predict the class of the input text
+    # 3. predict the class of the input text    
     result = model.predict(vector_input)[0]
     # 4. display the result
     if result == 1:
         st.header("Spam")
     else:
         st.header("Not Spam")
+
