@@ -1,60 +1,25 @@
-# Final version - 14/08/2025
-
 import streamlit as st
-import pickle
-import string
 import nltk
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 
-nltk.download('punkt')
-nltk.download('stopwords')
+st.title("NLTK Download Test")
 
-ps = PorterStemmer()
+try:
+    st.write("Attempting to download 'punkt'...")
+    nltk.download('punkt')
+    st.success("✅ 'punkt' downloaded successfully!")
 
-def transform_text(text):
-    text = text.lower()
-    text = nltk.word_tokenize(text)
+    st.write("Attempting to download 'stopwords'...")
+    nltk.download('stopwords')
+    st.success("✅ 'stopwords' downloaded successfully!")
 
-    y = []  # Initialize y as an empty list
-    for i in text:
-        if i.isalnum():
-            y.append(i)
-    
-    text = y[:]
-    y.clear()  # Clear the list y
+    st.write("---")
+    st.header("Testing Tokenizer")
+    test_sentence = "This is a test sentence."
+    tokens = nltk.word_tokenize(test_sentence)
+    st.write(f"Tokenizing: '{test_sentence}'")
+    st.write("Result:", tokens)
+    st.success("✅ Tokenizer test passed!")
 
-    for i in text:
-        if i not in stopwords.words('english') and i not in string.punctuation:
-            y.append(i)
-
-    text = y[:]
-    y.clear()  # Clear the list y again
-
-    for i in text:
-        y.append(ps.stem(i))
-
-    return " ".join(y)
-
-tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
-model = pickle.load(open('model.pkl', 'rb'))
-
-st.title("Emial/SMS Spam Classifier")
-
-input_sms = st.text_area("Enter the message")
-
-if st.button("Predict"):
-    # 1. preprocess the input text
-    transform_sms = transform_text(input_sms)
-    # 2. vectorize the input text
-    vector_input = tfidf.transform([transform_sms])
-    # 3. predict the class of the input text    
-    result = model.predict(vector_input)[0]
-    # 4. display the result
-    if result == 1:
-        st.header("Spam")
-    else:
-        st.header("Not Spam")
-
-
-
+except Exception as e:
+    st.error("A critical error occurred during the test:")
+    st.exception(e)
