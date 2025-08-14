@@ -5,6 +5,9 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
+nltk.download('punkt')
+nltk.download('stopwords')
+
 ps = PorterStemmer()
 
 def transform_text(text):
@@ -50,4 +53,5 @@ if st.button("Predict"):
         st.header("Spam")
     else:
         st.header("Not Spam")
+
 
